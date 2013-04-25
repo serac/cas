@@ -9,6 +9,18 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     Environment-specific configuration required for unit test execution.
   -->
 
+  <bean id="yourSslConfig" class="org.ldaptive.ssl.SslConfig">
+    <property name="credentialConfig">
+      <bean class="org.ldaptive.ssl.KeyStoreCredentialConfig"
+            p:trustStore="file:/path/to/your/truststore.jks"
+            p:trustStoreType="JKS"
+            p:trustStorePassword="changeit" />
+    </property>
+  </bean>
+
+  <bean id="authnConnectionConfig" parent="baseConnectionConfig"
+        p:sslConfig-ref="yourSslConfig" />
+
   <bean id="ldapAuthenticationHandler"
         class="org.jasig.cas.authentication.LdapAuthenticationHandler"
         p:principalIdAttribute="uid">
