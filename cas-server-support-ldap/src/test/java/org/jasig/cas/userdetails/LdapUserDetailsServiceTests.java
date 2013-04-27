@@ -39,8 +39,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Unit test for the {@link LdapUserDetailsService} class.
  *
- * @author Middleware Services
- * @version $Revision: $
+ * @author Marvin S. Addison
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/applicationContext-test.xml"})

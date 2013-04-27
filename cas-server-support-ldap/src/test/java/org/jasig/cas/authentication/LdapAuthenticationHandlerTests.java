@@ -38,8 +38,7 @@ import static org.junit.Assert.fail;
 /**
  * Unit test for {@link LdapAuthenticationHandler}.
  *
- * @author Middleware Services
- * @version $Revision: $
+ * @author Marvin S. Addison
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/applicationContext-test.xml"})
