@@ -32,6 +32,7 @@ import org.springframework.ldap.core.LdapTemplate;
  * @author Scott Battaglia
  * @since 3.2.1
  */
+@Deprecated
 public abstract class AbstractLdapPersonDirectoryCredentialsToPrincipalResolver extends
 AbstractPersonDirectoryCredentialsToPrincipalResolver {
 
