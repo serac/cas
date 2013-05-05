@@ -82,18 +82,23 @@ public final class CredentialsToLdapAttributePrincipalResolver extends
     /**
      * Creates a new instance with the requisite parameters.
      *
-     * @param  cf  Source of LDAP connections for search operation.
-     * @param  se  Executes the search operation.
+     * @param  connectionFactory  Source of LDAP connections for search operation.
+     * @param  searchExecutor  Executes the search operation.
      * @param  userAttribute  Attribute name in search result used for resolved principal identifier.
      */
-    public CredentialsToLdapAttributePrincipalResolver(final ConnectionFactory connectionFactory, final SearchExecutor searchExecutor,
+    public CredentialsToLdapAttributePrincipalResolver(final ConnectionFactory connectionFactory,
+                                                       final SearchExecutor searchExecutor,
                                                        final String userAttribute) {
         this.connectionFactory = connectionFactory;
         this.searchExecutor = searchExecutor;
         this.userNameAttribute = userAttribute;
     }
 
-    /** The name of the username parameter in the search filter expression. */
+    /**
+     * Specify the username parameter in the search filter.
+     *
+     * @param param The name of the username parameter in the search filter expression.
+     **/
     public void setSearchFilterUserNameParameter(final String param) {
         this.searchFilterUserNameParameter = param;
     }
@@ -171,6 +176,11 @@ public final class CredentialsToLdapAttributePrincipalResolver extends
         return ldapPrincipal.getId();
     }
 
+    /**
+     * Retrieve the resolved principal from LDAP.
+     * @param resolvedPrincipal
+     * @return the resolved LDAP principal
+     */
     private Principal resolveFromLDAP(final Principal resolvedPrincipal) {
         final SearchResult result;
         try {
@@ -206,13 +216,12 @@ public final class CredentialsToLdapAttributePrincipalResolver extends
      * Creates a CAS principal from an LDAP entry.
      *
      * @param  entry  LDAP entry.
-     *
      * @return  Resolved CAS principal.
      */
     private Principal principalFromEntry(final LdapEntry entry) {
         final LdapAttribute nameAttribute = entry.getAttribute(userNameAttribute);
         if (nameAttribute == null) {
-            log.warn("Username attribute {} not found on {}; returning null principal.", userNameAttribute, entry);
+            log.warn("Username attribute {} not found on {}; Returning null principal.", userNameAttribute, entry);
             return null;
         }
         final String id = nameAttribute.getStringValue();
@@ -245,7 +254,6 @@ public final class CredentialsToLdapAttributePrincipalResolver extends
      * Maps an LDAP attribute name onto a CAS attribute name.
      *
      * @param  ldapName  LDAP attribute name.
-     *
      * @return  Mapped name if a mapping exists for the given attribute, otherwise the original name.
      */
     private String mapAttributeName(final String ldapName) {
@@ -257,8 +265,7 @@ public final class CredentialsToLdapAttributePrincipalResolver extends
      * Constructs a new search filter using {@link SearchExecutor#searchFilter} as a template and
      * the username from the credential as a parameter.
      *
-     * @param  credentials  Source of username for LDAP search query.
-     *
+     * @param  principal
      * @return  Search filter with parameters applied.
      */
     private SearchFilter filterWithParams(final Principal principal) {
