@@ -162,20 +162,12 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
   </bean>
 
   <bean id="resolver"
-      class="org.jasig.cas.authentication.principal.ldap.CredentialsToLdapAttributePrincipalResolver"
-      c:connectionFactory-ref="authnConnectionFactory"
-      c:searchExecutor-ref="searchExecutorUser" >
+      class="org.jasig.cas.authentication.principal.ldap.CredentialsToLdapAttributePrincipalResolver">
 
     <property name="credentialsToPrincipalResolver">
         <bean class="org.jasig.cas.authentication.principal.UsernamePasswordCredentialsToPrincipalResolver" />
     </property>
-
-    <!-- Attributes fetched by and only available to the ldap resolver itself.
-         These are to only be used internally if/when needed and are not
-         related to the attribute policy resolution of CAS in anyway. -->
-    <property name="attributeMapping" ref="resultAttributeMapping" />
     <property name="attributeRepository" ref="attributeRepository" />
-    <property name="usernameProvider" ref="resolverUsernameProvider" />
   </bean>
 
   <bean id="resolverUsernameProvider"
