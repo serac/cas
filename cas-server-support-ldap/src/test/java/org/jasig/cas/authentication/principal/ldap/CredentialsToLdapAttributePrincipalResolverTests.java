@@ -50,7 +50,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class CredentialsToLdapAttributePrincipalResolverTests {
 
     private static final Logger log = LoggerFactory.getLogger(CredentialsToLdapAttributePrincipalResolverTests.class);
-    
+
     @Autowired
     private CredentialsToPrincipalResolver resolver;
 
