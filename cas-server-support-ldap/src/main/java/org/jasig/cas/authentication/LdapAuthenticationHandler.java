@@ -165,8 +165,8 @@ public class LdapAuthenticationHandler implements AuthenticationHandler {
                     new Credential(upc.getPassword()),
                     this.authenticatedEntryAttributes);
             response = this.authenticator.authenticate(request);
-        } catch (LdapException e) {
-            throw new PreventedException("Unexpected LDAP error", e);
+        } catch (final LdapException e) {
+            throw new PreventedException(e.getMessage(), e);
         }
         log.debug("LDAP response: {}", response);
         if (response.getResult()) {

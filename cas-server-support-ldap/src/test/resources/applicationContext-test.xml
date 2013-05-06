@@ -23,12 +23,12 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:c="http://www.springframework.org/schema/c"
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
-
 
   <!--
      +========================================================================
@@ -119,6 +119,17 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
     </constructor-arg>
   </bean>
 
+  <!--
+     +========================================================================
+     | LDAP authentication handler beans
+     +========================================================================
+  -->
+  <bean id="ldapAuthenticationHandler"
+        class="org.jasig.cas.authentication.LdapAuthenticationHandler"
+        p:principalIdAttribute="sAMAccountName">
+    <constructor-arg ref="authenticator" />
+    <property name="principalAttributeMap" ref="resultAttributeMapping" />
+  </bean>
 
   <!--
      +========================================================================
@@ -139,8 +150,9 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
         p:baseDN="${ldap.resolver.baseDn}"
         p:searchFilter="${ldap.resolver.searchFilter}"
         p:connectionFactory-ref="resolverPooledLdapConnectionFactory"
+        p:resultAttributeMapping-ref="resultAttributeMapping"
         p:unmappedUsernameAttribute="${ldap.resolver.userNameAttribute}"
-        p:resultAttributeMapping-ref="resultAttributeMapping">
+        p:usernameAttributeProvider-ref="resolverUsernameProvider">
     <property name="searchControls">
       <bean class="javax.naming.directory.SearchControls"
             p:countLimit="5"
@@ -149,6 +161,18 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
     </property>
   </bean>
 
+  <bean id="resolver"
+      class="org.jasig.cas.authentication.principal.ldap.CredentialsToLdapAttributePrincipalResolver">
+
+    <property name="credentialsToPrincipalResolver">
+        <bean class="org.jasig.cas.authentication.principal.UsernamePasswordCredentialsToPrincipalResolver" />
+    </property>
+    <property name="attributeRepository" ref="attributeRepository" />
+  </bean>
+
+  <bean id="resolverUsernameProvider"
+      class="org.jasig.services.persondir.support.SimpleUsernameAttributeProvider"
+      c:usernameAttribute="${ldap.resolver.userNameAttribute}" />
 
   <!--
      +========================================================================
@@ -187,34 +211,28 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
   <bean id="userDetailsPooledLdapConnectionFactory" class="org.ldaptive.pool.PooledConnectionFactory"
         p:connectionPool-ref="userDetailsConnectionPool" />
 
-  <bean id="ldapUserDetailsService" class="org.jasig.cas.userdetails.LdapUserDetailsService">
-    <!-- Source of LDAP connections for search operation. -->
-    <constructor-arg ref="userDetailsPooledLdapConnectionFactory" />
+  <bean id="ldapUserDetailsService" class="org.jasig.cas.userdetails.LdapUserDetailsService"
+      c:factory-ref="userDetailsPooledLdapConnectionFactory" c:userSearchExecutor-ref="searchExecutorUser"
+      c:roleSearchExecutor-ref="searchExecutorRole" c:userAttributeName-ref="ldapServiceUsernameProvider"
+      c:roleAttributeName-ref="ldapServiceRoleUsernameProvider" />
 
-    <!-- Component that performs the LDAP search operation for user data. -->
-    <constructor-arg>
-      <bean class="org.ldaptive.SearchExecutor"
-            p:baseDn="${ldap.userdetails.user.baseDn}"
-            p:searchFilter="${ldap.userdetails.user.searchFilter}"
-            p:returnAttributes-ref="userDetailsUserAttributes"
-          />
-    </constructor-arg>
+  <bean id="ldapServiceUsernameProvider"
+      class="org.jasig.services.persondir.support.SimpleUsernameAttributeProvider"
+      c:usernameAttribute="${ldap.userdetails.user.attribute}" />
 
-    <!-- Component that performs the LDAP search operation for role data. -->
-    <constructor-arg>
-      <bean class="org.ldaptive.SearchExecutor"
+  <bean id="ldapServiceRoleUsernameProvider"
+      class="org.jasig.services.persondir.support.SimpleUsernameAttributeProvider"
+      c:usernameAttribute="${ldap.userdetails.role.attribute}" />
+
+  <bean id="searchExecutorUser" class="org.ldaptive.SearchExecutor"
+        p:baseDn="${ldap.userdetails.user.baseDn}"
+        p:searchFilter="${ldap.userdetails.user.searchFilter}"
+        p:returnAttributes-ref="userDetailsUserAttributes" />
+
+  <bean id="searchExecutorRole" class="org.ldaptive.SearchExecutor"
             p:baseDn="${ldap.userdetails.role.baseDn}"
             p:searchFilter="${ldap.userdetails.role.searchFilter}"
-            p:returnAttributes-ref="userDetailsRoleAttributes"
-          />
-    </constructor-arg>
-
-    <!-- LDAP attribute to be used for user details username. -->
-    <constructor-arg value="${ldap.userdetails.user.attribute}" />
-
-    <!-- LDAP attribute to be used as basis for granted authority role name. -->
-    <constructor-arg value="${ldap.userdetails.role.attribute}" />
-  </bean>
+            p:returnAttributes-ref="userDetailsRoleAttributes" />
 
   <util:list id="userDetailsUserAttributes">
     <value>${ldap.userdetails.user.attribute}</value>
@@ -223,4 +241,9 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
   <util:list id="userDetailsRoleAttributes">
     <value>${ldap.userdetails.role.attribute}</value>
   </util:list>
+
+  <util:map id="resultAttributeMapping">
+    <entry key="cn" value="commonName" />
+    <entry key="name" value="name" />
+  </util:map>
 </beans>

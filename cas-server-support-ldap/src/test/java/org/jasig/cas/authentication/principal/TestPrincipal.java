@@ -35,6 +35,8 @@ import org.springframework.core.io.Resource;
  */
 public class TestPrincipal implements Principal {
 
+    private static final long serialVersionUID = -2842793158930192707L;
+
     private static final Logger LOG = LoggerFactory.getLogger(TestPrincipal.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -75,7 +77,8 @@ public class TestPrincipal implements Principal {
         final List<TestPrincipal> principals;
         try {
             LOG.info("Loading test principals from {}", resource);
-            principals = MAPPER.readValue(resource.getInputStream(), new TypeReference<List<TestPrincipal>>() {});
+            principals = MAPPER.readValue(resource.getInputStream(), new TypeReference<List<TestPrincipal>>() {
+            });
         } finally {
             resource.getInputStream().close();
         }

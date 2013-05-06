@@ -33,7 +33,9 @@ import java.util.List;
  * @author Marvin S. Addison
  * @since 3.1
  */
-public final class CredentialsToLDAPAttributePrincipalResolver extends AbstractLdapPersonDirectoryCredentialsToPrincipalResolver {
+@Deprecated
+public final class CredentialsToLDAPAttributePrincipalResolver extends
+                   AbstractLdapPersonDirectoryCredentialsToPrincipalResolver {
 
     /**
      * The CredentialsToPrincipalResolver that resolves the principal from the

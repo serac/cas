@@ -41,28 +41,17 @@ http://www.springframework.org/schema/util http://www.springframework.org/schema
   </bean>
 
   <bean id="authnConnectionConfig" parent="baseConnectionConfig"
-        p:sslConfig-ref="yourSslConfig" />
+      p:connectionInitializer-ref="bindInitializer" p:sslConfig-ref="yourSslConfig" />
 
-  <bean id="resolverConnectionConfig" parent="baseConnectionConfig"
-        p:sslConfig-ref="yourSslConfig" />
+  <bean id="bindInitializer" class="org.ldaptive.BindConnectionInitializer"
+      c:dn="${ldap.bind.dn}" c:credential-ref="bindCredential" />
 
-  <util:map id="resultAttributeMapping">
-    <entry key="uid" value="username" />
-    <entry key="memberOf" value="member" />
-  </util:map>
-
-  <bean id="ldapAuthenticationHandler"
-        class="org.jasig.cas.authentication.LdapAuthenticationHandler"
-        p:principalIdAttribute="uid">
-    <constructor-arg ref="authenticator" />
-    <property name="principalAttributeMap">
-      <map>
-        <entry key="member" value="memberOf" />
-        <entry key="eduPersonAffiliation" value="affiliation" />
-      </map>
-    </property>
-  </bean>
+  <bean id="bindCredential" class="org.ldaptive.Credential" c:password="${ldap.bind.password}" />
 
   <bean id="userDetailsConnectionConfig" parent="baseConnectionConfig"
-        p:sslConfig-ref="yourSslConfig" />
+      p:connectionInitializer-ref="bindInitializer" p:sslConfig-ref="yourSslConfig"/>
+
+  <bean id="resolverConnectionConfig" parent="baseConnectionConfig"
+      p:connectionInitializer-ref="bindInitializer" p:sslConfig-ref="yourSslConfig" />
+
 </beans>

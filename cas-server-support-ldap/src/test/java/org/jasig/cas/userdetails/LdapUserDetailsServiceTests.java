@@ -39,8 +39,7 @@ import static org.junit.Assert.assertEquals;
 /**
  * Unit test for the {@link LdapUserDetailsService} class.
  *
- * @author Middleware Services
- * @version $Revision: $
+ * @author Marvin S. Addison
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/applicationContext-test.xml"})
@@ -55,10 +54,8 @@ public class LdapUserDetailsServiceTests {
     @Qualifier("testUserDetails")
     private Properties testUserDetails;
 
-
     @Test
     public void testLoadUserByUsername() throws Exception {
-        String[] roles;
         User expected;
         for (String user : testUserDetails.stringPropertyNames()) {
             expected = parseUserDetails(testUserDetails.get(user).toString());

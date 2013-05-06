@@ -42,11 +42,7 @@ import org.springframework.test.annotation.ProfileValueSource;
  */
 public class RequiredConfigurationProfileValueSource implements ProfileValueSource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RequiredConfigurationProfileValueSource.class);
-
-    private static final String TRUE = "true";
-
-    private static final String FALSE = "false";
+    private static final Logger log = LoggerFactory.getLogger(RequiredConfigurationProfileValueSource.class);
 
     private Map<String, Resource[]> propertyResourceMap = new HashMap<String, Resource[]>();
 
@@ -85,16 +81,16 @@ public class RequiredConfigurationProfileValueSource implements ProfileValueSour
     @Override
     public String get(final String s) {
         final Resource[] resources = this.propertyResourceMap.get(s);
-        String result = FALSE;
+        String result = Boolean.FALSE.toString();
         if (resources != null) {
             for (Resource res : resources) {
-                LOG.debug("Checking for {}", res);
+                log.debug("Checking for {}", res);
                 if (!res.exists()) {
-                    LOG.info("Required configuration resource {} not found", res);
+                    log.info("Required configuration resource {} not found", res);
                     return result;
                 }
             }
-            result = TRUE;
+            result = Boolean.TRUE.toString();
         }
         return result;
     }
