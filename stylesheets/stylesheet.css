@@ -53,8 +53,8 @@ Theme Styles
 
 body {
   box-sizing: border-box;
-  color:#eee;
-  background: #52665a;
+  color:#111;
+  background: #98b3a2;
   font-size: 16px;
   font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -324,7 +324,6 @@ Full-Width Styles
   background: #fff;
   border-top: 1px solid #111;
   border-bottom: 1px solid #111;
-  border-right:1px solid #338054;
 }
 
 #main_content {
@@ -336,12 +335,13 @@ Full-Width Styles
 }
 
 #sidebar_wrap {
-  float:right;
-  color:#3d664f;
+  float: right;
+  color: #3d664f;
+  background-color: #fff;
   border-top: 1px solid #111;
-  border-bottom: 1px solid #111;
-  width:200px;
-  height:100%;
+  border-left:1px solid #338054;
+  width: 200px;
+  height: 100%;
 }
 
 
