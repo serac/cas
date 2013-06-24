@@ -1,4 +1,5 @@
 ---
+layout: default
 title: CAS Web SSO
 ---
 # CAS - SSO for the Web
