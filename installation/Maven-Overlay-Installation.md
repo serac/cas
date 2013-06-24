@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Maven Overlay Installation
+style_path: ../stylesheets
 ---
 CAS installation is a fundamentally source-oriented process, and we recommend a [Maven WAR overlay](http://maven.apache.org/plugins/maven-war-plugin/overlays.html) project to organize customizations such as component configuration and UI design. A simple Maven WAR overlay project is provided for reference and study:
 

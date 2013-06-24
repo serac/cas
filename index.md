@@ -1,20 +1,17 @@
 ---
 layout: default
 title: CAS Web SSO
+style_path: stylesheets
 ---
-# CAS - SSO for the Web
+# CAS - Single Sign-On for the Web
 
-* TOC placeholder element
-{:toc}
+CAS (Central Authentication Service) provides an enterprise single sign-on service with the following notable features:
 
-Test GitHub Pages index page in MarkDown.
+* Java (Spring Webflow/MVC servlet) server component
+* Support for multiple protocols (CAS, SAML, OAuth, OpenID)
+* Cross-platform client support (Java, .Net, PHP, Perl, Apache, etc)
+* Integrates with uPortal, BlueSocket, Moodle, and Google Apps to name a few
 
-* Item 1
-* Item 2
-* Item 3
+In addition to software, CAS provides a friendly open source community that actively supports and contributes to the project. While the project is rooted in higher-ed open source, it has grown to an international audience with a scope from Fortune 500 companies to small special-purpose installations.
 
-## Section 1
-lorem ipsum
-
-## Section 2
-more lorem ipsum
+[installation/Maven-Overlay-Installation]
