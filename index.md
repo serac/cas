@@ -3,6 +3,7 @@ title: CAS Web SSO
 ---
 # CAS - SSO for the Web
 
+* TOC placeholder element
 {:toc}
 
 Test GitHub Pages index page in MarkDown.
