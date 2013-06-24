@@ -1,3 +1,6 @@
+---
+title: Navigation Sidebar
+---
 #Installation
 * Authentication
 * Ticketing
