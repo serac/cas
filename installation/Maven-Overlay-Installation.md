@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Maven Overlay Installation
-style_path: ../stylesheets
 ---
 # Maven Overlay Installation
 CAS installation is a fundamentally source-oriented process, and we recommend a

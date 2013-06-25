@@ -1,7 +1,6 @@
 ---
 layout: default
 title: CAS Web SSO
-style_path: stylesheets
 ---
 # Enterprise Single Sign-On
 

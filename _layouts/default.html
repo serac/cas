@@ -5,9 +5,10 @@
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
     <meta name="description" content="CAS - Single Sign-On for the Web" />
-
+    {% capture lvl %}{{ page.url | append:'index.html' | split:'/' | size }}{% endcapture %}
+    {% capture relative %}{% for i in (3..lvl) %}../{% endfor %}{% endcapture %}
     <link rel="stylesheet" type="text/css" media="screen"
-          href="{{ page.style_path }}/stylesheet.css">
+          href="{{ relative }}stylesheets/stylesheet.css">
 
     <title>{{ page.title }}</title>
   </head>
@@ -18,7 +19,9 @@
     <div id="header_wrap" class="outer">
         <header class="inner">
           <a id="forkme_banner" href="https://github.com/serac/cas">View on GitHub</a>
-          <h1 id="project_title">CAS</h1>
+          <div id="project_title">
+            <a href="{{ relative }}"><img src="{{ relative }}images/cas_logo.png"/></a>
+          </div>
           <h2 id="project_tagline">Single Sign-On for the Web</h2>
         </header>
     </div>
