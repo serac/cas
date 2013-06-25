@@ -4,11 +4,12 @@ title: Maven Overlay Installation
 style_path: ../stylesheets
 ---
 # Maven Overlay Installation
-CAS installation is a fundamentally source-oriented process, and we recommend a [Maven WAR overlay]
-(http://maven.apache.org/plugins/maven-war-plugin/overlays.html) project to organize customizations such as component
-configuration and UI design. The output of a Maven WAR overlay build is a `cas.war` file that can be deployed on a Java
-servlet container like [Tomcat](http://tomcat.apache.org/whichversion.html). A simple Maven WAR overlay project is
-provided for reference and study:
+CAS installation is a fundamentally source-oriented process, and we recommend a
+[Maven WAR overlay](http://maven.apache.org/plugins/maven-war-plugin/overlays.html) project to organize
+customizations such as component configuration and UI design.
+The output of a Maven WAR overlay build is a `cas.war` file that can be deployed on a Java servlet container like
+[Tomcat](http://tomcat.apache.org/whichversion.html).
+A simple Maven WAR overlay project is provided for reference and study:
 
 [cas-maven-war-overlay]
 
