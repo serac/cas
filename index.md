@@ -1,6 +1,6 @@
 ---
 layout: default
-title: CAS Web SSO
+title: CAS - Home
 ---
 # Enterprise Single Sign-On
 
