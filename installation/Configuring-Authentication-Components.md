@@ -17,7 +17,7 @@ commonly contains additional metadata attributes
 authentication event; these are commonly used to set protocol-specific data.
 
 ## AuthenticationManager
-CAS ships with a single yet flexible authentication manager, `PolicyBasedAuthenticationManager` that should be
+CAS ships with a single yet flexible authentication manager, `PolicyBasedAuthenticationManager`, that should be
 sufficient for most needs. It performs authentication according to the following contract.
 
 For each given credential do the following:
@@ -268,5 +268,5 @@ connection pooling, which is _strongly_ recommended for all environments.
       p:authenticationControls-ref="authControls" />
 {% endhighlight %}
 
-Please see the [ldaptive](http://www.ldaptive.org/) documentation for more information or to accommodate more
-complex configurations.
+Please see the [ldaptive documentation](http://www.ldaptive.org/) for more information or to accommodate more
+complex configurations. Active Directory users should review 
