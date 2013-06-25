@@ -338,10 +338,33 @@ Full-Width Styles
   float: right;
   color: #3d664f;
   background-color: #fff;
-  border-top: 1px solid #111;
-  border-left:1px solid #338054;
+  border-left:1px solid #ddd;
+  margin-top:1px;
   width: 200px;
   height: 100%;
+}
+
+#sidebar_content ul, #sidebar_content li, #sidebar_content h1 {
+  margin: 0;
+  padding: 0;
+}
+
+#sidebar_content li {
+  margin-left: 6px;
+  list-style-type: circle;
+}
+
+#sidebar_content {
+  color: #666;
+  font-size: 14px;
+}
+
+#sidebar_content h1 {
+  margin: 4px 0 2px 0;
+  color: #aaa;
+  font-size:16px;
+  text-transform: capitalize;
+  border-bottom: 1px solid #f58d6d;
 }
 
 
