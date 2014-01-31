@@ -128,17 +128,16 @@ public class GoogleAccountsService extends AbstractWebApplicationService {
         final HttpServletRequest request, final PrivateKey privateKey,
         final PublicKey publicKey, final String alternateUserName) {
         final String relayState = request.getParameter(CONST_RELAY_STATE);
-
-        final String xmlRequest = decodeAuthnRequestXML(request
-            .getParameter(CONST_PARAM_SERVICE));
+        final String xmlRequest = decodeAuthnRequestXML(request.getParameter(CONST_PARAM_SERVICE));
+        LOG.debug("RelayState={}", relayState);
+        LOG.debug("SAMLRequest={}", xmlRequest);
 
         if (!StringUtils.hasText(xmlRequest)) {
+            LOG.debug("SAML2 assertion not found in request");
             return null;
         }
 
-        final Document document = SamlUtils
-            .constructDocumentFromXmlString(xmlRequest);
-
+        final Document document = SamlUtils.constructDocumentFromXmlString(xmlRequest);
         if (document == null) {
             return null;
         }
@@ -221,11 +220,12 @@ public class GoogleAccountsService extends AbstractWebApplicationService {
         return String.valueOf(chars);
       }
 
-    private static String decodeAuthnRequestXML(
-        final String encodedRequestXmlString) {
+    private static String decodeAuthnRequestXML(final String encodedRequestXmlString) {
         if (encodedRequestXmlString == null) {
+            LOG.debug("Encoded SAML2 request not found");
             return null;
         }
+        LOG.debug("Found encoded SAML2 request {}", encodedRequestXmlString);
 
         final byte[] decodedBytes = base64Decode(encodedRequestXmlString);
 
@@ -256,6 +256,7 @@ public class GoogleAccountsService extends AbstractWebApplicationService {
             }
             return new String(baos.toByteArray());
         } catch (final Exception e) {
+            LOG.debug("SAML2 assertion zlib decoding error.", e);
             return null;
         } finally {
             try {
@@ -271,6 +272,7 @@ public class GoogleAccountsService extends AbstractWebApplicationService {
             final byte[] xmlBytes = xml.getBytes("UTF-8");
             return Base64.decodeBase64(xmlBytes);
         } catch (final Exception e) {
+            LOG.debug("Base64 decode error", e);
             return null;
         }
     }
@@ -295,10 +297,9 @@ public class GoogleAccountsService extends AbstractWebApplicationService {
 
             inflater.end();
             return new String(xmlMessageBytes, 0, resultLength, "UTF-8");
-        } catch (final DataFormatException e) {
+        } catch (final Exception e) {
+            LOG.debug("SAML2 assertion zlib decoding error", e);
             return null;
-        } catch (final UnsupportedEncodingException e) {
-            throw new RuntimeException("Cannot find encoding: UTF-8", e);
         }
     }
 }
