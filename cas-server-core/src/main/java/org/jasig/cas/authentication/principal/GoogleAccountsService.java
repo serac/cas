@@ -137,8 +137,11 @@ public class GoogleAccountsService extends AbstractWebApplicationService {
             return null;
         }
 
-        final Document document = SamlUtils.constructDocumentFromXmlString(xmlRequest);
-        if (document == null) {
+        final Document document;
+        try {
+            document = SamlUtils.constructDocumentFromXmlString(xmlRequest);
+        } catch (Exception e) {
+            LOG.debug("Error building XML document", e);
             return null;
         }
 

@@ -103,7 +103,7 @@ public final class SamlUtils {
             return builder
                 .build(new ByteArrayInputStream(xmlString.getBytes()));
         } catch (final Exception e) {
-            return null;
+            throw new RuntimeException("Error building XML document", e);
         }
     }
 
