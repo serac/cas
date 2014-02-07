@@ -19,10 +19,13 @@
 package org.jasig.cas.adaptors.jdbc;
 
 import java.security.GeneralSecurityException;
+import java.util.List;
 
+import org.jasig.cas.Message;
 import org.jasig.cas.authentication.PreventedException;
 import org.jasig.cas.authentication.principal.Principal;
 import org.jasig.cas.authentication.principal.SimplePrincipal;
+import org.jasig.cas.util.Pair;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
 
@@ -49,13 +52,13 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
 
     /** {@inheritDoc} */
     @Override
-    protected final Principal authenticateUsernamePasswordInternal(final String username, final String password)
+    protected final Pair<Principal, List<Message>> authenticateUsernamePasswordInternal(
+            final String username, final String encodedPassword)
             throws GeneralSecurityException, PreventedException {
 
-        final String encryptedPassword = this.getPasswordEncoder().encode(password);
         try {
             final String dbPassword = getJdbcTemplate().queryForObject(this.sql, String.class, username);
-            if (!dbPassword.equals(encryptedPassword)) {
+            if (!dbPassword.equals(encodedPassword)) {
                 throw new FailedLoginException("Password does not match value on record.");
             }
         } catch (final IncorrectResultSizeDataAccessException e) {
@@ -67,7 +70,7 @@ public class QueryDatabaseAuthenticationHandler extends AbstractJdbcUsernamePass
         } catch (final DataAccessException e) {
             throw new PreventedException("SQL exception while executing query for " + username, e);
         }
-        return new SimplePrincipal(username);
+        return newAuthnSuccessResult(new SimplePrincipal(username));
     }
 
     /**

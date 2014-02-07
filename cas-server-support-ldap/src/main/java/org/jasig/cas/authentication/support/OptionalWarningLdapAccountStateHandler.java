@@ -45,7 +45,7 @@ import org.ldaptive.auth.AuthenticationResponse;
  * @author Marvin S. Addison
  * @since 4.0.0
  */
-public class OptionalWarningAccountStateHandler extends DefaultAccountStateHandler {
+public class OptionalWarningLdapAccountStateHandler extends DefaultLdapAccountStateHandler {
 
     /** Name of user attribute that describes whether or not to display expiration warnings. */
     @NotNull
@@ -58,6 +58,14 @@ public class OptionalWarningAccountStateHandler extends DefaultAccountStateHandl
     /** True to opt into password expiration warnings on match, false to opt out on match. */
     private boolean displayWarningOnMatch = true;
 
+    /**
+     * Creates a new instance wit given parameters.
+     *
+     * @param configuration Password policy configuration.
+     */
+    public OptionalWarningLdapAccountStateHandler(final PasswordPolicyConfiguration configuration) {
+        super(configuration);
+    }
 
     /**
      * Sets the user attribute used to determine whether to display password expiration warnings.
@@ -91,7 +99,6 @@ public class OptionalWarningAccountStateHandler extends DefaultAccountStateHandl
     protected void handleWarning(
             final AccountState.Warning warning,
             final AuthenticationResponse response,
-            final LdapPasswordPolicyConfiguration configuration,
             final List<Message> messages) {
 
         final LdapAttribute attribute = response.getLdapEntry().getAttribute(this.warningAttributeName);
@@ -102,7 +109,7 @@ public class OptionalWarningAccountStateHandler extends DefaultAccountStateHandl
         }
         logger.debug("matches={}, displayWarningOnMatch={}", matches, displayWarningOnMatch);
         if (displayWarningOnMatch == matches) {
-            super.handleWarning(warning, response, configuration, messages);
+            super.handleWarning(warning, response, messages);
         }
     }
 }

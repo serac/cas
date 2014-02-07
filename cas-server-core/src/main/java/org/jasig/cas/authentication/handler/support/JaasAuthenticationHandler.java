@@ -19,6 +19,7 @@
 package org.jasig.cas.authentication.handler.support;
 
 import java.security.GeneralSecurityException;
+import java.util.List;
 import java.util.Set;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
@@ -29,9 +30,11 @@ import javax.security.auth.login.Configuration;
 import javax.security.auth.login.LoginContext;
 import javax.validation.constraints.NotNull;
 
+import org.jasig.cas.Message;
 import org.jasig.cas.authentication.PreventedException;
 import org.jasig.cas.authentication.principal.Principal;
 import org.jasig.cas.authentication.principal.SimplePrincipal;
+import org.jasig.cas.util.Pair;
 import org.springframework.util.Assert;
 
 /**
@@ -88,12 +91,13 @@ public class JaasAuthenticationHandler extends AbstractUsernamePasswordAuthentic
 
     /** {@inheritDoc} */
     @Override
-    protected final Principal authenticateUsernamePasswordInternal(final String username, final String password)
+    protected final Pair<Principal, List<Message>> authenticateUsernamePasswordInternal(
+            final String username, final String encodedPassword)
             throws GeneralSecurityException, PreventedException {
 
         final LoginContext lc = new LoginContext(
                 this.realm,
-                new UsernamePasswordCallbackHandler(username, password));
+                new UsernamePasswordCallbackHandler(username, encodedPassword));
         try {
             logger.debug("Attempting authentication for: {}", username);
             lc.login();
@@ -106,7 +110,7 @@ public class JaasAuthenticationHandler extends AbstractUsernamePasswordAuthentic
         if (principals != null && principals.size() > 0) {
             principal = new SimplePrincipal(principals.iterator().next().getName());
         }
-        return principal;
+        return newAuthnSuccessResult(principal);
     }
 
     public void setRealm(final String realm) {

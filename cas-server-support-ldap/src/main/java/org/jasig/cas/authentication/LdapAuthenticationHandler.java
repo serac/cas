@@ -32,9 +32,11 @@ import javax.security.auth.login.LoginException;
 import javax.validation.constraints.NotNull;
 
 import org.jasig.cas.Message;
+import org.jasig.cas.authentication.handler.support.AbstractUsernamePasswordAuthenticationHandler;
 import org.jasig.cas.authentication.principal.Principal;
 import org.jasig.cas.authentication.principal.SimplePrincipal;
-import org.jasig.cas.authentication.support.LdapPasswordPolicyConfiguration;
+import org.jasig.cas.authentication.support.LdapAccountStateHandler;
+import org.jasig.cas.util.Pair;
 import org.ldaptive.LdapAttribute;
 import org.ldaptive.LdapEntry;
 import org.ldaptive.LdapException;
@@ -59,7 +61,7 @@ import org.slf4j.LoggerFactory;
  * @author Marvin S. Addison
  * @since 4.0
  */
-public class LdapAuthenticationHandler implements AuthenticationHandler {
+public class LdapAuthenticationHandler extends AbstractUsernamePasswordAuthenticationHandler {
 
     /** Logger instance. */
     protected final Logger logger = LoggerFactory.getLogger(getClass());
@@ -89,8 +91,8 @@ public class LdapAuthenticationHandler implements AuthenticationHandler {
     /** Set of LDAP attributes fetch from an entry as part of the authentication process. */
     private String[] authenticatedEntryAttributes;
 
-    /** LDAP password policy configuration. */
-    private LdapPasswordPolicyConfiguration ldapPasswordPolicyConfiguration;
+    /** Handles ldaptive response with account state information. */
+    private LdapAccountStateHandler ldapAccountStateHandler;
 
 
     /**
@@ -100,15 +102,6 @@ public class LdapAuthenticationHandler implements AuthenticationHandler {
      */
     public LdapAuthenticationHandler(@NotNull final Authenticator authenticator) {
         this.authenticator = authenticator;
-    }
-
-    /**
-     * Sets the component name. Defaults to simple class name.
-     *
-     * @param  name  Authentication handler name.
-     */
-    public void setName(final String name) {
-        this.name = name;
     }
 
     /**
@@ -158,24 +151,26 @@ public class LdapAuthenticationHandler implements AuthenticationHandler {
     }
 
     /**
-     * Sets the LDAP password policy configuration. If none is defined, password expiration policy support will be
+     * Sets the ldaptive account state handler. If none is defined, password expiration policy support will be
      * disabled.
      *
-     * @param configuration LDAP password policy configuration. Set to null to disable password policy support.
+     * @param handler Handler that examines ldaptive {@link AuthenticationResponse} for password policy support.
      */
-    public void setLdapPasswordPolicyConfiguration(final LdapPasswordPolicyConfiguration configuration) {
-        this.ldapPasswordPolicyConfiguration = configuration;
+    public void setLdapAccountStateHandler(final LdapAccountStateHandler handler) {
+        this.ldapAccountStateHandler = handler;
     }
 
     @Override
-    public HandlerResult authenticate(final Credential credential) throws GeneralSecurityException,
-                                PreventedException {
+    protected final Pair<Principal, List<Message>> authenticateUsernamePasswordInternal(
+            final String username, final String encodedPassword)
+            throws GeneralSecurityException, PreventedException {
+
         final AuthenticationResponse response;
-        final UsernamePasswordCredential upc = (UsernamePasswordCredential) credential;
         try {
-            logger.debug("Attempting LDAP authentication for {}", credential);
-            final AuthenticationRequest request = new AuthenticationRequest(upc.getUsername(),
-                    new org.ldaptive.Credential(upc.getPassword()),
+            logger.debug("Attempting LDAP authentication for {}", username);
+            final AuthenticationRequest request = new AuthenticationRequest(
+                    username,
+                    new org.ldaptive.Credential(encodedPassword),
                     this.authenticatedEntryAttributes);
             response = this.authenticator.authenticate(request);
         } catch (final LdapException e) {
@@ -184,35 +179,20 @@ public class LdapAuthenticationHandler implements AuthenticationHandler {
         logger.debug("LDAP response: {}", response);
 
         final List<Message> messageList;
-        if (this.ldapPasswordPolicyConfiguration != null) {
+        if (this.ldapAccountStateHandler != null) {
             logger.debug("Applying password policy to {}", response);
-            messageList = this.ldapPasswordPolicyConfiguration.getAccountStateHandler().handle(
-                    response, ldapPasswordPolicyConfiguration);
+            messageList = this.ldapAccountStateHandler.handle(response);
         } else {
             messageList = Collections.emptyList();
         }
         if (response.getResult()) {
-            return new HandlerResult(
-                    this,
-                    new BasicCredentialMetaData(credential),
-                    createPrincipal(upc.getUsername(), response.getLdapEntry()),
-                    messageList);
+            return newAuthnSuccessResult(createPrincipal(username, response.getLdapEntry()), messageList);
         }
 
         if (AuthenticationResultCode.DN_RESOLUTION_FAILURE == response.getAuthenticationResultCode()) {
-            throw new AccountNotFoundException(upc.getUsername() + " not found.");
+            throw new AccountNotFoundException(username + " not found.");
         }
         throw new FailedLoginException("Invalid credentials.");
-    }
-
-    @Override
-    public boolean supports(final Credential credential) {
-        return credential instanceof UsernamePasswordCredential;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
     }
 
     /**

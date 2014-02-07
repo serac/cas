@@ -31,18 +31,16 @@ import org.ldaptive.auth.AuthenticationResponse;
  * @author Marvin S. Addison
  * @since 4.0.0
  */
-public interface AccountStateHandler {
+public interface LdapAccountStateHandler {
     /**
      * Handles the account state producing an error or warning messages as appropriate to the state.
      *
      * @param response LDAP authentication response containing attributes, response controls, and account state that
      *                 can be used to determine user account state.
-     * @param configuration Password policy configuration.
      *
      * @return  List of warning messages.
      *
      * @throws LoginException When account state causes authentication failure.
      */
-    List<Message> handle(AuthenticationResponse response, LdapPasswordPolicyConfiguration configuration)
-            throws LoginException;
+    List<Message> handle(AuthenticationResponse response) throws LoginException;
 }

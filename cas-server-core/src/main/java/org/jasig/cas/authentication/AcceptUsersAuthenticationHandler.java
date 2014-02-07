@@ -20,11 +20,14 @@ package org.jasig.cas.authentication;
 
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
+import org.jasig.cas.Message;
 import org.jasig.cas.authentication.handler.support.AbstractUsernamePasswordAuthenticationHandler;
 import org.jasig.cas.authentication.principal.Principal;
 import org.jasig.cas.authentication.principal.SimplePrincipal;
+import org.jasig.cas.util.Pair;
 
 import javax.security.auth.login.AccountNotFoundException;
 import javax.security.auth.login.FailedLoginException;
@@ -56,7 +59,8 @@ public class AcceptUsersAuthenticationHandler extends AbstractUsernamePasswordAu
 
     /** {@inheritDoc} */
     @Override
-    protected final Principal authenticateUsernamePasswordInternal(final String username, final String password)
+    protected final Pair<Principal, List<Message>> authenticateUsernamePasswordInternal(
+            final String username, final String password)
             throws GeneralSecurityException, PreventedException {
 
         final String cachedPassword = this.users.get(username);
@@ -70,7 +74,7 @@ public class AcceptUsersAuthenticationHandler extends AbstractUsernamePasswordAu
         if (!cachedPassword.equals(encodedPassword)) {
             throw new FailedLoginException();
         }
-        return new SimplePrincipal(username);
+        return newAuthnSuccessResult(new SimplePrincipal(username));
     }
 
     /**

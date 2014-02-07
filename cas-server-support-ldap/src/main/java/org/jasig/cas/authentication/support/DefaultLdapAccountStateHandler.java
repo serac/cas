@@ -27,6 +27,7 @@ import javax.security.auth.login.AccountExpiredException;
 import javax.security.auth.login.AccountLockedException;
 import javax.security.auth.login.CredentialExpiredException;
 import javax.security.auth.login.LoginException;
+import javax.validation.constraints.NotNull;
 
 import org.jasig.cas.Message;
 import org.jasig.cas.authentication.AccountDisabledException;
@@ -50,10 +51,14 @@ import org.slf4j.LoggerFactory;
  * @author Marvin S. Addison
  * @since 4.0.0
  */
-public class DefaultAccountStateHandler implements AccountStateHandler {
+public class DefaultLdapAccountStateHandler implements LdapAccountStateHandler {
 
     /** Logger instance. */
     protected final Logger logger = LoggerFactory.getLogger(getClass());
+
+    /** Password policy configuration. */
+    @NotNull
+    protected final PasswordPolicyConfiguration passwordPolicyConfiguration;
 
     /** Map of account state error to CAS authentication exception. */
     private static final Map<AccountState.Error, LoginException> ERROR_MAP;
@@ -75,9 +80,18 @@ public class DefaultAccountStateHandler implements AccountStateHandler {
         ERROR_MAP.put(PasswordPolicyControl.Error.PASSWORD_EXPIRED, new CredentialExpiredException());
     }
 
+
+    /**
+     * Creates a new instance wit given parameters.
+     *
+     * @param configuration Password policy configuration.
+     */
+    public DefaultLdapAccountStateHandler(final PasswordPolicyConfiguration configuration) {
+        this.passwordPolicyConfiguration = configuration;
+    }
+
     @Override
-    public List<Message> handle(final AuthenticationResponse response, final LdapPasswordPolicyConfiguration configuration)
-            throws LoginException {
+    public List<Message> handle(final AuthenticationResponse response) throws LoginException {
 
         final AccountState state = response.getAccountState();
         final AccountState.Error error;
@@ -91,8 +105,8 @@ public class DefaultAccountStateHandler implements AccountStateHandler {
             warning = null;
         }
         final List<Message> messages = new ArrayList<Message>();
-        handleError(error, response, configuration, messages);
-        handleWarning(warning, response, configuration, messages);
+        handleError(error, response, messages);
+        handleWarning(warning, response, messages);
         return messages;
     }
 
@@ -103,7 +117,6 @@ public class DefaultAccountStateHandler implements AccountStateHandler {
      *
      * @param error Account state error.
      * @param response Ldaptive authentication response.
-     * @param configuration Password policy configuration.
      * @param messages Container for messages produced by account state error handling.
      *
      * @throws LoginException On errors that should be communicated as login exceptions.
@@ -111,7 +124,6 @@ public class DefaultAccountStateHandler implements AccountStateHandler {
     protected void handleError(
             final AccountState.Error error,
             final AuthenticationResponse response,
-            final LdapPasswordPolicyConfiguration configuration,
             final List<Message> messages)
             throws LoginException {
 
@@ -131,17 +143,15 @@ public class DefaultAccountStateHandler implements AccountStateHandler {
      *
      * @param error Account state warning.
      * @param response Ldaptive authentication response.
-     * @param configuration Password policy configuration.
      * @param messages Container for messages produced by account state warning handling.
      */
     protected void handleWarning(
             final AccountState.Warning warning,
             final AuthenticationResponse response,
-            final LdapPasswordPolicyConfiguration configuration,
             final List<Message> messages) {
 
+        logger.debug("Handling {}", warning);
         if (warning == null) {
-            logger.debug("Account state warning not defined");
             return;
         }
 
@@ -150,13 +160,13 @@ public class DefaultAccountStateHandler implements AccountStateHandler {
         logger.debug(
                 "Password expires in {} days. Expiration warning threshold is {} days.",
                 ttl.getDays(),
-                configuration.getPasswordWarningNumberOfDays());
-        if (configuration.isAlwaysDisplayPasswordExpirationWarning()
-                || ttl.getDays() < configuration.getPasswordWarningNumberOfDays()) {
+                this.passwordPolicyConfiguration.getPasswordWarningNumberOfDays());
+        if (this.passwordPolicyConfiguration.isAlwaysDisplayPasswordExpirationWarning()
+                || ttl.getDays() < this.passwordPolicyConfiguration.getPasswordWarningNumberOfDays()) {
             messages.add(new PasswordExpiringWarningMessage(
                     "Password expires in {0} days. Please change your password at <href=\"{1}\">{1}</a>",
                     ttl.getDays(),
-                    configuration.getPasswordPolicyUrl()));
+                    this.passwordPolicyConfiguration.getPasswordPolicyUrl()));
         }
         if (warning.getLoginsRemaining() > 0) {
             messages.add(new Message(

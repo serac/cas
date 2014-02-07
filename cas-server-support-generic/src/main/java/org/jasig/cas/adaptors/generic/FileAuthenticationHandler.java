@@ -22,12 +22,15 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.jasig.cas.Message;
 import org.jasig.cas.authentication.PreventedException;
 import org.jasig.cas.authentication.handler.support.AbstractUsernamePasswordAuthenticationHandler;
 import org.jasig.cas.authentication.principal.Principal;
 import org.jasig.cas.authentication.principal.SimplePrincipal;
+import org.jasig.cas.util.Pair;
 import org.springframework.core.io.Resource;
 
 import javax.security.auth.login.AccountNotFoundException;
@@ -62,15 +65,16 @@ public class FileAuthenticationHandler extends AbstractUsernamePasswordAuthentic
 
     /** {@inheritDoc} */
     @Override
-    protected final Principal authenticateUsernamePasswordInternal(final String username, final String password)
+    protected final Pair<Principal, List<Message>> authenticateUsernamePasswordInternal(
+            final String username, final String encodedPassword)
             throws GeneralSecurityException, PreventedException {
         try {
             final String passwordOnRecord = getPasswordOnRecord(username);
             if (passwordOnRecord == null) {
                 throw new AccountNotFoundException(username + " not found in backing file.");
             }
-            if (password != null && this.getPasswordEncoder().encode(password).equals(passwordOnRecord)) {
-                return new SimplePrincipal(username);
+            if (encodedPassword != null && this.getPasswordEncoder().encode(encodedPassword).equals(passwordOnRecord)) {
+                return newAuthnSuccessResult(new SimplePrincipal(username));
             }
         } catch (final IOException e) {
             throw new PreventedException("IO error reading backing file", e);

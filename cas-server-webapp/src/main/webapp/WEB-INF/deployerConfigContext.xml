@@ -105,13 +105,25 @@
        | * org.jasig.cas.support.spnego.authentication.handler.support.JCIFSSpnegoAuthenticationHandler
        -->
     <bean id="primaryAuthenticationHandler"
-          class="org.jasig.cas.authentication.AcceptUsersAuthenticationHandler">
+          class="org.jasig.cas.authentication.AcceptUsersAuthenticationHandler"
+          p:passwordPolicyConfiguration-ref="passwordPolicy">
         <property name="users">
             <map>
                 <entry key="casuser" value="Mellon"/>
             </map>
         </property>
     </bean>
+
+    <!--
+       | The following bean defines high-level password policy configuration.
+       | The only authentication handler that ships with CAS 4.0.0 that supports password policy is
+       | org.jasig.cas.authentication.LdapAuthenticationHandler.
+       | In any case the passwordPolicy bean definition should be left in place.
+       -->
+    <bean id="passwordPolicy" class="org.jasig.cas.authentication.support.PasswordPolicyConfiguration"
+        p:alwaysDisplayPasswordExpirationWarning="${password.policy.warnAll}"
+        p:passwordWarningNumberOfDays="${password.polcy.warningDays}"
+        p:passwordPolicyUrl="${password.policy.url}" />
 
     <!-- Required for proxy ticket mechanism -->
     <bean id="proxyPrincipalResolver"
